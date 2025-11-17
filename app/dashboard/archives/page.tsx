@@ -88,64 +88,64 @@ interface SubmissionItemProps {
 }
 
 type ViewType =
-  | "students"
-  | "projects"
-  | "results"
-  | "archive"
-  | "performance"
-  | "forum"
-  | "dashborad";
+    | "students"
+    | "projects"
+    | "results"
+    | "archive"
+    | "performance"
+    | "forum"
+    | "dashborad";
 
-const menuItem=[
-                        {
-                            key: 'students', label: 'Dashboard', icon: (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-2v2m-4-2v2m-2-6h10a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z"></path>
-                                </svg>
-                            )
-                        },
-                        {
-                            key: 'projects', label: 'Projets', icon: (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                                </svg>
-                            )
-                        },
-                        {
-                            key: 'results', label: 'Dépôts', icon: (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6h6m-6 0h-2M18 18a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6h-2m-2 0h-6m6 0h2"></path>
-                                </svg>
-                            )
-                        },
-                        {
-                            key: 'performance', label: 'Performances', icon: (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            )
-                        },
-                        {
-                            key: 'forum', label: 'Forum', icon: (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"
-                                    />
-                                </svg>
-                            )
-                        },
-                        {
-                            key: 'archive', label: 'Archives', icon: (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-                                </svg>
-                            )
-                        },
+const menuItem = [
+    {
+        key: 'students', label: 'Dashboard', icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-2v2m-4-2v2m-2-6h10a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z"></path>
+            </svg>
+        )
+    },
+    {
+        key: 'projects', label: 'Projets', icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>
+        )
+    },
+    {
+        key: 'results', label: 'Dépôts', icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6h6m-6 0h-2M18 18a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6h-2m-2 0h-6m6 0h2"></path>
+            </svg>
+        )
+    },
+    {
+        key: 'performance', label: 'Performances', icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+        )
+    },
+    {
+        key: 'forum', label: 'Forum', icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"
+                />
+            </svg>
+        )
+    },
+    {
+        key: 'archive', label: 'Archives', icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+            </svg>
+        )
+    },
 
-                    ] as const;
+] as const;
 
 const Dashboard: React.FC = () => {
     // const [dataSet, setDataSet] = useState<any[]>([{}])
@@ -215,7 +215,7 @@ const Dashboard: React.FC = () => {
         let archivedIds: number[] = [];
         try {
             archivedIds = JSON.parse(archivedIdsRaw).map((x: unknown) => Number(x)).filter((n: number) => !Number.isNaN(n));
-         
+
         } catch (e) {
             archivedIds = [];
         }
@@ -870,7 +870,7 @@ const Dashboard: React.FC = () => {
                         {submission.evaluation?.grade !== undefined && ( // Utiliser !== undefined pour inclure la note 0
                             <div className="flex-shrink-0 flex items-center">
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-sm ${submission.evaluation.grade >= 15 ? 'bg-green-50 text-green-700' :
-                                    submission.evaluation?.grade >= 10  ? 'bg-yellow-50 text-yellow-700' :
+                                    submission.evaluation?.grade >= 10 ? 'bg-yellow-50 text-yellow-700' :
                                         'bg-red-50 text-red-700'
                                     }`}>
                                     {submission.evaluation?.grade}/20
@@ -1025,9 +1025,6 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="flex min-h-screen bg-gray-100 font-sans"
-            style={{
-                // overflow
-            }}
         >
             {/* Sidebar */}
             <aside className="w-64 bg-gray-800 text-white flex flex-col p-4 sticky top-0 h-screen overflow-y-hidden shadow-xl h-full">
@@ -1060,22 +1057,22 @@ const Dashboard: React.FC = () => {
                     {/* Fonction pour le style actif (Active/Hover Style Function) */}
                     {/* J'utilise une simple bordure latérale et un fond subtil pour le statut actif */}
                     {
-                    menuItem.map(({ key, label, icon }) => (
-                        <button
-                            key={key}
-                            onClick={() => setView(key)}
-                            className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-4 text-sm font-medium transition-all duration-200 
+                        menuItem.map(({ key, label, icon }) => (
+                            <button
+                                key={key}
+                                onClick={() => setView(key)}
+                                className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-4 text-sm font-medium transition-all duration-200 
                     ${view === key
-                                    // Style actif : Bordure à gauche + fond bleu très léger
-                                    ? 'bg-indigo-900 text-white border-l-4 border-indigo-400'
-                                    // Style normal : Hover subtil
-                                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                                }`}
-                        >
-                            {icon}
-                            <span className="font-semibold">{label}</span>
-                        </button>
-                    ))}
+                                        // Style actif : Bordure à gauche + fond bleu très léger
+                                        ? 'bg-indigo-900 text-white border-l-4 border-indigo-400'
+                                        // Style normal : Hover subtil
+                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                                    }`}
+                            >
+                                {icon}
+                                <span className="font-semibold">{label}</span>
+                            </button>
+                        ))}
                 </div>
 
                 {/* FOOTER : Statut et Déconnexion */}

@@ -34,7 +34,7 @@ const Login: React.FC<LoginProps> = ({setShowLoginModal }) => {
       setMessage('Connexion réussie !');
       setTimeout(() => {
         if (user.role === 'superadmin') router.push('/dashboardSuperAdmin');
-        else if (user.role === 'admin') router.push('/dashboardAdmin');
+        else if (user.role === 'admin') router.push('/dashboard');
         else router.push('/student');
       }, 1000);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

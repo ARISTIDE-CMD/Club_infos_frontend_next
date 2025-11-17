@@ -15,7 +15,7 @@ import {
 import type { 
     ChartData, 
     ChartOptions, // Ajout de ChartOptions pour typer les options du graphique
-    ChartTypeRegistry
+    // ChartTypeRegistry
 } from 'chart.js';
 
 // Enregistrement des composants nécessaires de Chart.js (une seule fois)

@@ -181,3 +181,49 @@ html {
     font-size: 100%;
   }
 }
+
+/* ---------- INPUTS & TEXTAREAS ---------- */
+input, textarea {
+  color: var(--foreground); /* Texte bien contrasté */
+  background-color: var(--background); /* Fond selon ton thème */
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  outline: none;
+  -webkit-font-smoothing: auto; /* Texte plus net */
+  text-rendering: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+  transition: color 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #6366f1; /* Couleur de focus visible */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+  -webkit-font-smoothing: auto;
+  color: var(--foreground);
+}
+
+input:disabled,
+textarea:disabled {
+  background-color: #f1f5f9;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Ajustement responsive si besoin */
+@media (max-width: 768px) {
+  input, textarea {
+    font-size: 0.95rem;
+    padding: 0.45rem 0.65rem;
+  }
+}
