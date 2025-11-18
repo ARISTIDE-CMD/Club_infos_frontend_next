@@ -10,7 +10,7 @@ export default function StudentSearch() {
     setQuery(e.target.value);
     if (e.target.value.length > 2) {
       const res = await searchStudents(e.target.value);
-      setResults(res);
+      setResults(res ?? []);
     } else {
       setResults([]);
     }

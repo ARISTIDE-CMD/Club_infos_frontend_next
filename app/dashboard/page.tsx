@@ -261,12 +261,12 @@ export default function StudentsPage() {
       const response = await api.get("/students", {
         headers: { Authorization: `Bearer ${token}` },
       });
-const reponse = await api.get("/students/index-typesense", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+// const reponse = await api.get("/students/index-typesense", {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
       setStudents(response.data.students);
       console.log("Liste des étudiants ", response.data.students);
-      console.log("Liste des projets ", reponse.data);
+      // console.log("Liste des projets ", reponse.data);
 
     } catch (error) {
       console.error("Erreur lors du chargement des étudiants:", error);
