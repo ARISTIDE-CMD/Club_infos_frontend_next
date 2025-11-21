@@ -5,7 +5,7 @@ const client = new Typesense.Client({
     { host: "localhost", port: 8108, protocol: "http" }
   ],
   apiKey: "aris12345",
-  connectionTimeoutSeconds: 2
+  connectionTimeoutSeconds: 1
 });
 
 export default client;
