@@ -5,7 +5,7 @@ export async function GET(req: Request) {
   const q = searchParams.get("q") || "";
 
   const res = await fetch(
-    `http://localhost:8108/collections/students/documents/search?q=${q}&query_by=first_name`,
+    `http://localhost:8108/collections/students/documents/search?q=${q}&query_by=first_name,last_name,class_group&prefix=true`,
     {
       headers: {
         "X-TYPESENSE-API-KEY": "xyz",
