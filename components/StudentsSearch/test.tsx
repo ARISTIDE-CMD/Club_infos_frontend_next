@@ -345,6 +345,57 @@ export default function StudentsPage() {
     student.class_group?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+const ListHit=({ hit }: { hit: any })=> {
+    
+        return (
+                      <tr
+                        key={hit.id}
+                        // Hover simple et élégant
+                        className="hover:bg-green-50/20 transition-colors duration-200 group"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <td className="py-4 px-6 font-medium text-gray-800">
+                          {hit.last_name}
+                        </td>
+                        <td className="py-4 px-6  text-gray-700">
+                          {hit.first_name}
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded text-xs font-mono">
+                            {hit.student_id}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          {/* Badge de classe avec couleur et fond coordonnés */}
+                          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                            {hit.class_group}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex justify-center space-x-2">
+                            {/* Bouton Modifier : Couleur primaire */}
+                            <button
+                              onClick={() => handleEdit(hit)}
+                              className="p-2 bg-green-500 text-white rounded-lg text-xs font-medium hover:bg-green-600 transition-colors duration-200 shadow-sm flex items-center gap-1"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-7-6l4 4m-4-4l-9 9m9-9l9 9"></path></svg>
+                              {/* Modifier */}
+                            </button>
+
+                            {/* Bouton Supprimer : Couleur d'alerte sobre */}
+                            <button
+                              onClick={() => handleDeleteStudent(hit.id)}
+                              className="p-2 bg-red-500 text-white rounded-lg text-xs font-medium hover:bg-red-800 transition-colors duration-200 shadow-sm flex items-center gap-1"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                              {/* Supprimer */}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+
   return (
     <>
       <div><header className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">

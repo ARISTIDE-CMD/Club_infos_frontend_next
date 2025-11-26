@@ -1,33 +1,13 @@
 'use client';
 
-import React from 'react';
-import { InstantSearch, SearchBox, Hits, Pagination, Configure } from 'react-instantsearch';
+import { InstantSearch, SearchBox, Hits, Pagination, Configure, RefinementList, useInstantSearch } from 'react-instantsearch';
 // import proxySearchClient from './instantsearchProxyClient' // unused
 import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
 // searchStudents is not used here; we rely on typesense-instantsearch-adapter directly
 
-import {proxySearchClient} from '@/public/lib/instantsearchProxyClient';
-import {assembleTypesenseServerConfig} from '@/public/utils/typesense';
 // Exemple en JS / node
 import Typesense from 'typesense';
 
-const client = new Typesense.Client({
-  nodes: [{ host: 'localhost', port: 8108, protocol: 'http' }],
-  apiKey: 'xyz', // ta clé admin ou bootstrap
-});
-
-async function createSearchKey() {
-  const key = await client.keys().create({
-    description: 'Search + multi_search key pour frontend',
-    actions: ['documents:search'], // permet de chercher
-    collections: ['students'], // ou un pattern
-    expires_at: 0, // 0 = n’expire pas, ou un timestamp unix
-  });
-
-  console.log('Nouvelle clé :', key);
-}
-
-createSearchKey();
 
 
 type StudentHitProps = {
@@ -40,18 +20,29 @@ type StudentHitProps = {
   };
 };
 
-const typesenseServerConfig = assembleTypesenseServerConfig();
-
 const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
-  server: typesenseServerConfig,
-  additionalSearchParameters: {
-    query_by: 'first_name,last_name,class_group',
+  server: {
+    apiKey: 'xyz',
+    nodes: [
+      {
+        host: 'localhost',
+        protocol: 'http',
+        port: 8108
+      }
+    ]
   },
-});
+  additionalSearchParameters: {
+    query_by: 'first_name, last_name,class_group'
+  }
+})
 
-
-function StudentHit({ hit }: { hit: StudentHitProps['hit'] }) { 
-  {console.log(hit)}
+function StudentHit({ hit }: { hit: StudentHitProps['hit'] }) {
+  { console.log(hit) }
+  const { indexUiState } = useInstantSearch();
+  const query = indexUiState.query as string;
+  if (!query) {
+    return null;
+  }
   return (
     <li
       key={hit.id}
@@ -67,14 +58,16 @@ function StudentHit({ hit }: { hit: StudentHitProps['hit'] }) {
       </div>
     </li>
   );
- 
+
 }
+
 
 export default function StudentSearchInstantProxy() {
   return (
     <div className="max-w-xl mx-auto mt-8">
-      <InstantSearch indexName="students" searchClient={proxySearchClient}>
-        <Configure hitsPerPage={50} />
+      <InstantSearch indexName="students" searchClient={typesenseInstantsearchAdapter.searchClient}>
+        <Configure hitsPerPage={10} />
+        <RefinementList attribute='class_group' />
 
         <div className="mb-6 w-full">
           <SearchBox
@@ -87,9 +80,9 @@ export default function StudentSearchInstantProxy() {
             }}
           />
         </div>
-
+        {/* <RefinementList attribute="class_group" /> */}
         <ul className="space-y-2">
-          <Hits<StudentHitProps['hit']> hitComponent={StudentHit} classNames={{
+          <Hits  hitComponent={StudentHit} classNames={{
             list: "ais-Hits-list",
             item: "ais-Hits-item",
           }} />
@@ -104,6 +97,7 @@ export default function StudentSearchInstantProxy() {
               selectedItem: "bg-blue-600 text-white",
             }}
           />
+
         </div>
       </InstantSearch>
     </div>
