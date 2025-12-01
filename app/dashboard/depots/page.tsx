@@ -1,105 +1,134 @@
 'use client';
 
-import { InstantSearch, SearchBox, Hits, Pagination, Configure, RefinementList, useInstantSearch } from 'react-instantsearch';
-// import proxySearchClient from './instantsearchProxyClient' // unused
-import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
-// searchStudents is not used here; we rely on typesense-instantsearch-adapter directly
+import { useState, useRef, useEffect } from "react";
+import { InstantSearch, Hits, SearchBox, useInstantSearch } from "react-instantsearch";
+import TypesenseInstantsearchAdapter from "typesense-instantsearch-adapter";
+import { User, Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-// Exemple en JS / node
-import Typesense from 'typesense';
+/* ---------------- TYPESENSE ADAPTER ---------------- */
+const typesenseInstantSearchAdapter = new TypesenseInstantsearchAdapter({
+    server: {
+        apiKey: "xyz",
+        nodes: [
+            {
+                protocol: "http",
+                host: "localhost",
+                port: 8108,
+            },
+        ],
+    },
+    additionalSearchParameters: {
+        query_by: "last_name,student_id",
+    },
+});
 
+const highlightMatch = (text: string | number, query: string) => {
+    if (!query) return text;
 
+    const textStr = text.toString();
+    const lowerText = textStr.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const index = lowerText.indexOf(lowerQuery);
 
-type StudentHitProps = {
-  hit: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    class_group: string;
-    __position: number;
-  };
+    if (index === -1) return textStr;
+
+    const before = textStr.slice(0, index);
+    const match = textStr.slice(index, index + query.length);
+    const after = textStr.slice(index + query.length);
+
+    return (
+        <>
+            {before}
+            <mark className="bg-yellow-300 text-purple-900 font-bold px-1 rounded">{match}</mark>
+            {after}
+        </>
+    );
 };
 
-const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
-  server: {
-    apiKey: 'xyz',
-    nodes: [
-      {
-        host: 'localhost',
-        protocol: 'http',
-        port: 8108
-      }
-    ]
-  },
-  additionalSearchParameters: {
-    query_by: 'first_name, last_name,class_group'
-  }
-})
+/* ------------------- DROPDOWN RESULT ITEM ------------------- */
+const ContactItem = ({ hit }: any) => {
+    const router = useRouter();
+    const goToStudent = () => router.push(`logStudent/${hit.id}`);
 
-function StudentHit({ hit }: { hit: StudentHitProps['hit'] }) {
-  { console.log(hit) }
-  const { indexUiState } = useInstantSearch();
-  const query = indexUiState.query as string;
-  if (!query) {
-    return null;
-  }
-  return (
-    <li
-      key={hit.id}
-      className="p-4 mb-2 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors"
-    >
-      <div className="text-lg font-medium text-gray-800">
-        {hit.first_name} {hit.last_name}
-      </div>
-      <div className="text-sm text-gray-500 mt-1">
-        Groupe : {hit.class_group} <br />
-        id : {hit.id}
+    const { indexUiState } = useInstantSearch();
+    const query = indexUiState.query as string;
 
-      </div>
-    </li>
-  );
-
-}
-
-
-export default function StudentSearchInstantProxy() {
-  return (
-    <div className="max-w-xl mx-auto mt-8">
-      <InstantSearch indexName="students" searchClient={typesenseInstantsearchAdapter.searchClient}>
-        <Configure hitsPerPage={10} />
-        <RefinementList attribute='class_group' />
-
-        <div className="mb-6 w-full">
-          <SearchBox
-            placeholder="Rechercher un étudiant…"
-            classNames={{
-              root: "w-full",
-              form: "flex items-center bg-gray-100 rounded-md overflow-hidden",
-              input: "flex-1 px-4 py-2 bg-transparent focus:outline-none",
-              // submit: "px-4 py-2 bg-blue-600 text-white hover:bg-blue-700",
-            }}
-          />
+    return (
+        <div
+            onClick={goToStudent}
+            className="p-4 bg-white rounded-lg hover:shadow-xl hover:bg-purple-50 transition-all cursor-pointer  border-purple-100"
+        >
+            <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow">
+                    <User className="w-6 h-6 text-purple-900" />
+                </div>
+                <div>
+                    <p className="text-lg font-bold text-purple-900">
+                        {highlightMatch(hit.last_name, query)}
+                    </p>
+                    <p className="text-sm text-purple-600">ID: {highlightMatch(hit.student_id, query)}</p>
+                </div>
+            </div>
         </div>
-        {/* <RefinementList attribute="class_group" /> */}
-        <ul className="space-y-2">
-          <Hits  hitComponent={StudentHit} classNames={{
-            list: "ais-Hits-list",
-            item: "ais-Hits-item",
-          }} />
-        </ul>
+    );
+};
 
-        <div className="mt-6 flex justify-center">
-          <Pagination
-            classNames={{
-              list: "flex space-x-2",
-              item: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300",
-              link: "focus:outline-none",
-              selectedItem: "bg-blue-600 text-white",
-            }}
-          />
+/* ------------------- DROPDOWN COMPONENT ------------------- */
+const DropdownResults = () => {
+    const { indexUiState } = useInstantSearch();
+    const query = indexUiState.query || "";
 
+    if (!query) return null;
+
+    return (
+        <div className="absolute z-50 mt-3 w-full bg-white rounded-xl shadow-xl border border-purple-200 p-4 max-h-96 overflow-auto animate-fadeIn">
+            <Hits hitComponent={ContactItem} />
         </div>
-      </InstantSearch>
-    </div>
-  );
+    );
+};
+
+/* ------------------- MAIN SEARCH COMPONENT ------------------- */
+export default function ContactSearch() {
+    const [open, setOpen] = useState(false);
+    const boxRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-yellow-50 to-purple-100 py-10 px-5">
+            <div className="max-w-4xl mx-auto">
+                <InstantSearch
+                    indexName="students"
+                    searchClient={typesenseInstantSearchAdapter.searchClient}
+                >
+                    <div ref={boxRef} className="relative max-w-3xl mx-auto mb-10">
+                        {/* SearchBox */}
+                        <SearchBox
+                            onFocus={() => setOpen(true)}
+                            placeholder="Rechercher un contact..."
+                            classNames={{
+                                root: "relative",
+                                form: "relative flex items-center",
+                                input:
+                                    "w-full pl-14 pr-14 py-5 text-lg text-purple-900 placeholder-purple-400 font-medium rounded-2xl shadow-2xl border-2 border-purple-200 focus:outline-none",
+                            }}
+                        />
+
+                        {/* Animated dropdown */}
+                        {open && <DropdownResults />}
+                    </div>
+                </InstantSearch>
+            </div>
+        </div>
+    );
 }
