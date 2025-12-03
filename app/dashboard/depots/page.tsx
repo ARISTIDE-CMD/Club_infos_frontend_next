@@ -2,6 +2,7 @@
 import Image from "next/image"
 import { createContext, useContext, useEffect, useState, useRef } from "react"
 import { SearchBox, Hits, useInstantSearch, InstantSearch, Configure } from "react-instantsearch"
+import api from "@/api"
 
 import TypesenseInstantsearchAdapter from "typesense-instantsearch-adapter"
 
@@ -31,9 +32,9 @@ const typesenseInstantSearchAdapter = new TypesenseInstantsearchAdapter({
     }
 })
 
-const cache = [
+const recents = [
     {
-        id: '0',
+        id: 0,
         author: 'Alejandro Escamilla',
         width: 5616,
         height: 3744,
@@ -41,7 +42,7 @@ const cache = [
         download_url: 'https://picsum.photos/id/0/5616/3744'
     },
     {
-        id: '1',
+        id: 1,
         author: 'John Doe',
         width: 5000,
         height: 3333,
@@ -49,7 +50,7 @@ const cache = [
         download_url: 'https://picsum.photos/id/1/5000/3333'
     },
     {
-        id: '2',
+        id: 2,
         author: 'Jane Smith',
         width: 6000,
         height: 4000,
@@ -57,7 +58,19 @@ const cache = [
         download_url: 'https://picsum.photos/id/2/6000/4000'
     },
     {
-        id: '3',
+        id: 7,
+        author: 'Frank Green',
+        width: 5300,
+        height: 3600,
+        url: 'https://unsplash.com/photos/example7',
+        download_url: 'https://picsum.photos/id/7/5300/3600'
+    },
+
+]
+
+const populate = [
+    {
+        id: 3,
         author: 'Alice Johnson',
         width: 4000,
         height: 6000,
@@ -65,7 +78,7 @@ const cache = [
         download_url: 'https://picsum.photos/id/3/4000/6000'
     },
     {
-        id: '4',
+        id: 4,
         author: 'Bob Brown',
         width: 4500,
         height: 3000,
@@ -73,7 +86,7 @@ const cache = [
         download_url: 'https://picsum.photos/id/4/4500/3000'
     },
     {
-        id: '5',
+        id: 5,
         author: 'Charlie Davis',
         width: 4800,
         height: 3200,
@@ -81,64 +94,13 @@ const cache = [
         download_url: 'https://picsum.photos/id/5/4800/3200'
     },
     {
-        id: '6',
+        id: 6,
         author: 'Eve White',
         width: 5200,
         height: 3500,
         url: 'https://unsplash.com/photos/example6',
         download_url: 'https://picsum.photos/id/6/5200/3500'
     },
-    {
-        id: '7',
-        author: 'Frank Green',
-        width: 5300,
-        height: 3600,
-        url: 'https://unsplash.com/photos/example7',
-        download_url: 'https://picsum.photos/id/7/5300/3600'
-    },
-    {
-        id: '8',
-        author: 'Grace Hopper',
-        width: 5400,
-        height: 3700,
-        url: 'https://unsplash.com/photos/example8',
-        download_url: 'https://picsum.photos/id/8/5400/3700'
-    },
-    {
-        id: '9',
-        author: 'Hannah Lee',
-        width: 5500,
-        height: 3800,
-        url: 'https://unsplash.com/photos/example9',
-        download_url: 'https://picsum.photos/id/9/5500/3800'
-    },
-    {
-        id: '10',
-        author: 'Ivy King',
-        width: 5600,
-        height: 3900,
-        url: 'https://unsplash.com/photos/example10',
-        download_url: 'https://picsum.photos/id/10/5600/3900'
-    }
-]
-
-const TopSell = [
-    {
-        id: '0',
-        author: 'Alejandro Escamilla',
-        width: 5616,
-        height: 3744,
-        url: 'https://unsplash.com/photos/yC-Yzbqy7PY',
-        download_url: 'https://picsum.photos/id/0/5616/3744'
-    },
-    {
-        id: '1',
-        author: 'John Doe',
-        width: 5000,
-        height: 3333,
-        url: 'https://unsplash.com/photos/example',
-        download_url: 'https://picsum.photos/id/1/5000/3333'
-    }
 ]
 
 const SearchUIContext = createContext({
@@ -254,32 +216,55 @@ const SearchResultsBlock = () => {
 };
 
 
-
-// const ConditionalDisplay = () => {
-//     const { indexUiState } = useInstantSearch();
-//     const query = indexUiState.query as string;
-
-//     return query && query.length > 0 ? (
-//         <SearchResultsBlock />
-//     ) : (
-//         <Default />
-//     );
-// };
-
-
-
 const Default=()=>{
-       const [pictures, setPictures] = useState<typeof cache>([]);
-    useEffect(() => {
-        const stored = localStorage.getItem("picture_cache");
+    const [picturesRecents, setPicturesRecents] = useState<typeof recents>([]);
+    const [picturesPopulate, setPicturesPopulate] = useState<typeof populate>([]);
+    const [picturesMoments, setPicturesMoments] = useState<typeof populate>([]);
+    const responseMoment=async()=>{
+        try {
+            const response = await api.get('/list');
+            console.log("moment pictures:", response.data);
+            setPicturesMoments(response.data);
+            localStorage.setItem("pictureMoment_cach", JSON.stringify(response.data));
+        } catch (error) {
+            console.error("Error fetching moment pictures:", error);
+            return [];
+        }
+    }
 
-        if (stored) {
-            setPictures(JSON.parse(stored));
+
+    useEffect(() => {
+        const recentCache = localStorage.getItem("pictureRecents_cach");
+        const populatCache = localStorage.getItem("picturePopulate_cach");
+        const momentCache = localStorage.getItem("pictureMoment_cach");
+        console.log("Caches:", { recentCache, populatCache, momentCache });
+//
+        if (recentCache) {
+            setPicturesRecents(JSON.parse(recentCache));
         } else {
-            localStorage.setItem("picture_cache", JSON.stringify(cache));
-            setPictures(cache);
+            localStorage.setItem("pictureRecents_cach", JSON.stringify(recents));
+            setPicturesRecents(recents);
+        }
+//
+        if (populatCache) {
+            setPicturesPopulate(JSON.parse(populatCache));
+        } else {
+            localStorage.setItem("picturePopulate_cach", JSON.stringify(populate));
+            setPicturesPopulate(populate);
+        }
+
+        if (momentCache) {
+            setPicturesMoments(JSON.parse(momentCache));
+        } else {
+            responseMoment()
         }
     }, []);
+
+    const removeRecentSearch = (id: number) => {
+        const updatedPictures = picturesRecents.filter(pic => pic.id !== id);
+        setPicturesRecents(updatedPictures);
+        localStorage.setItem("pictureRencents_cach", JSON.stringify(updatedPictures));
+    }
     return(
         <div className="bg-white min-h-[320px] w-full max-w-4xl mx-auto p-2 rounded-lg">
                 <div className="flex flex-col md:flex-row gap-6 md:gap-8">
@@ -289,25 +274,24 @@ const Default=()=>{
                             <h3 className="text-lg font-semibold text-purple-800 mb-3">Mes recherches récentes</h3>
                             <ul className="space-y-2">
                                 {
-                                    pictures.slice(0, 2).map((pic) => (
-                                        <li key={pic.id} className="px-3 py-2 bg-purple-50 rounded-md border border-purple-100">{pic.author}</li>
+                                    picturesRecents.map((pic) => (
+                                        <div key={pic.id} className="flex items-center justify-between space-x-4 px-3 py-2 ">
+                                        <li className="px-3 py-2 bg-purple-50 rounded-md border border-purple-100">{pic.author}</li>
+                                        <button onClick={() => removeRecentSearch(pic.id)} className="">X</button>
+                                        </div>
                                     ))
                                 }
-                                {/* <li className="px-3 py-2 bg-purple-50 rounded-md border border-purple-100">Jean Bruno</li>
-                            <li className="px-3 py-2 bg-purple-50 rounded-md border border-purple-100">Clément prince</li> */}
                             </ul>
                         </div>
 
                         <div>
                             <h3 className="text-lg font-semibold text-purple-800 mb-3">Recherches populaires</h3>
-                            <ul className="grid grid-cols-1 gap-2">
+                            <ul className="grid grid-cols-2 gap-5">
                                 {
-                                    pictures.slice(2, 6).map((pic) => (
-                                        <li key={pic.id} className="px-3 py-2 rounded-md bg-white border border-purple-100">{pic.author}</li>
+                                    picturesPopulate.map((pic) => (
+                                        <li key={pic.id} className="px-3 py-2 rounded-lg bg-white border border-purple-100" style={{textAlign:'center'}}>{pic.author}</li>
                                     ))
                                 }
-                                {/* <li className="px-3 py-2 rounded-md bg-white border border-purple-100">Jean</li>
-                            <li className="px-3 py-2 rounded-md bg-white border border-purple-100">Clément</li> */}
                             </ul>
                         </div>
 
@@ -315,12 +299,10 @@ const Default=()=>{
                             <h3 className="text-lg font-semibold text-purple-800 mb-3">Catégories du moment</h3>
                             <ul className="space-y-2">
                                 {
-                                    pictures.slice(6, 10).map((pic) => (
+                                    picturesMoments?.map((pic) => (
                                         <li key={pic.id} className="px-3 py-2 rounded-md bg-white border border-purple-100">{pic.author}</li>
                                     ))
                                 }
-                                {/* <li className="px-3 py-2 rounded-md bg-white border border-purple-100">Jean</li>
-                            <li className="px-3 py-2 rounded-md bg-white border border-purple-100">Clément</li> */}
                             </ul>
                         </div>
                     </div>
@@ -338,34 +320,6 @@ const Default=()=>{
             </div>
     )
 }
-
-const HitsComponent = ({ hit }: { hit: HitProps['hit'] }) => {
-      const { indexUiState } = useInstantSearch();
-    const query = indexUiState.query as string;
-    if(!query) return null;
-    return(
-        <div>
-            <ul>
-                <li key={hit.id} className="px-3 py-2 bg-purple-50 rounded-md border border-purple-100">{hit.author}</li>
-            </ul>
-        </div>
-    )
-}
-
-// const SearchComponent = () => {
-//     const { results } = useInstantSearch();
-
-//     useEffect(() => {
-//         // You can access the results here if needed
-//         console.log(results);
-//     }, [results]);
-
-//     return (
-//         <div className="p-4 bg-white rounded-lg shadow-sm border border-purple-100">
-//             <Hits hitComponent={HitsComponent} classNames={{ list: 'grid grid-cols-1 sm:grid-cols-2 gap-4', item: '' }} />
-//         </div>
-//     );
-// }
 
 export default function Racine() {
     const [isOpen, setIsOpen] = useState(false);
@@ -386,7 +340,6 @@ export default function Racine() {
 
     return (
         <SearchUIContext.Provider value={{ isOpen, setIsOpen }} >
-
             <div ref={containerRef} className="w-full max-w-4xl mx-auto p-6 bg-white">
                 <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
                     <Configure hitsPerPage={20} />
