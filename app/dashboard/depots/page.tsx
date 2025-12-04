@@ -1,5 +1,5 @@
 'use client'
-import Image from "next/image"
+// import Image from "next/image"
 import { createContext, useContext, useEffect, useState, useRef } from "react"
 import { SearchBox, Hits, useInstantSearch, InstantSearch, Configure } from "react-instantsearch"
 import api from "@/api"
@@ -8,7 +8,7 @@ import TypesenseInstantsearchAdapter from "typesense-instantsearch-adapter"
 
 type HitProps = {
     hit: {
-        id:number,
+        id: number,
         author: string,
         download_url: any,
         width: number,
@@ -23,7 +23,7 @@ const typesenseInstantSearchAdapter = new TypesenseInstantsearchAdapter({
             {
                 protocol: 'http',
                 port: 8108,
-                host: 'localhost'
+                host: '192.168.1.209'
             }
         ]
     },
@@ -105,7 +105,7 @@ const populate = [
 
 const SearchUIContext = createContext({
     isOpen: false,
-    setIsOpen: (_: boolean) => {}
+    setIsOpen: (_: boolean) => { }
 });
 
 const useSearchUI = () => useContext(SearchUIContext);
@@ -136,7 +136,7 @@ const SearchInput = () => {
 
 const HitsList = ({ hit }: { hit: HitProps['hit'] }) => {
     return (
-        <div className="bg-white rounded-md overflow-hidden border border-purple-100 shadow-sm">
+        <div className="bg-white rounded-md overflow-hidden border border-purple-100 shadow-sm w-full">
             <img src={hit.download_url} alt={hit.author} className="w-full h-40 object-cover" />
             <div className="p-3">
                 <h4 className="text-sm font-medium text-purple-800">{hit.author}</h4>
@@ -162,38 +162,82 @@ const highlightQuery = (text: string, query: string) => {
     );
 };
 
+const componentsResults = () => {
+    return (
+        <>
+            <div>
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">Recherches populaires</h3>
+                <ul className="grid grid-cols-4 gap-5">
+                    {recents.map((pic) => (
+                        <li key={pic.id} className="px-3 py-2 rounded-2xl bg-white border border-purple-100 text-center">{pic.author}</li>
+                    ))}
+                </ul>
+            </div>
+
+            <div className="overflow-x-auto scrollbar-hide py-4">
+                <div className="flex gap-4">
+                    {populate.map((element) => (
+                        <div
+                            key={element.id}
+                            className="flex-shrink-0 bg-white rounded-md overflow-hidden border border-purple-100 shadow-sm w-60"
+                        >
+                            <img
+                                src={element.download_url}
+                                alt={element.author}
+                                className="w-full h-40 object-cover"
+                            />
+                            <div className="p-3">
+                                <h4 className="text-sm font-medium text-purple-800">{element.author}</h4>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+        </>
+    )
+}
+
 
 const SearchResultsBlock = () => {
     const { isOpen } = useSearchUI();
     const { indexUiState } = useInstantSearch();
     const query = indexUiState.query as string;
-
+    const containerRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (isOpen && containerRef.current) {
+            // Cherche l'input dans le SearchBox
+            const input = containerRef.current.querySelector<HTMLInputElement>("input");
+            if (input) input.focus();
+        }
+    }, [isOpen]);
     if (!isOpen) return null;
 
     return (
         <div
-            className={`w-full max-w-4xl mx-auto mt-4 overflow-hidden transition-all duration-500 ${
-                isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
-            }`}
+            className={` max-w-4xl mx-auto mt-4 overflow-hidden transition-all duration-500 ${isOpen ? "max-h-[1000px] opacity-100 w-full" : "max-h-0 opacity-0"
+                }`}
+            ref={containerRef}
         >
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-300 space-y-4">
+            <div className="bg-white  rounded-lg shadow-lg  border-purple-300 space-y-4">
                 {/* SearchBox à l’intérieur */}
                 <SearchBox
-                    onFocus={() => {}}
                     classNames={{
                         root: "w-full",
-                        form: "relative flex items-center border border-purple-300 rounded-md overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-purple-400 transition-all duration-300",
-                        input: "flex-grow px-3 py-2 pr-12 outline-none text-gray-700 placeholder-gray-400",
+                        form: "relative flex items-center border-2 border-purple-300 rounded-full overflow-hidden shadow-md focus-within:ring-4 focus-within:ring-purple-300 transition-all duration-300",
+                        input: "flex-grow px-4 py-3 pr-14 outline-none text-gray-700 placeholder-gray-400 focus:outline-none",
                         submit: "absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-200 rounded-full",
                         reset: "absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-150",
                     }}
+
                     placeholder="Rechercher des images..."
                 />
 
                 {/* Contenu selon saisie */}
                 {query ? (
                     <>
-                        <h3 className="text-lg font-semibold text-purple-700">
+                       <div>
+                        <h3 className="font-semibold text-purple-700">
                             Résultats pour : "{query}"
                         </h3>
                         <Hits
@@ -206,7 +250,8 @@ const SearchResultsBlock = () => {
                                 list: "grid grid-cols-1 sm:grid-cols-2 gap-4",
                             }}
                         />
-                    </>
+                        {componentsResults()}
+                   </div>  </>
                 ) : (
                     <Default />
                 )}
@@ -216,11 +261,11 @@ const SearchResultsBlock = () => {
 };
 
 
-const Default=()=>{
+const Default = () => {
     const [picturesRecents, setPicturesRecents] = useState<typeof recents>([]);
     const [picturesPopulate, setPicturesPopulate] = useState<typeof populate>([]);
     const [picturesMoments, setPicturesMoments] = useState<typeof populate>([]);
-    const responseMoment=async()=>{
+    const responseMoment = async () => {
         try {
             const response = await api.get('/list');
             console.log("moment pictures:", response.data);
@@ -228,7 +273,7 @@ const Default=()=>{
             localStorage.setItem("pictureMoment_cach", JSON.stringify(response.data));
         } catch (error) {
             console.error("Error fetching moment pictures:", error);
-            return [];
+            // return [];
         }
     }
 
@@ -238,14 +283,14 @@ const Default=()=>{
         const populatCache = localStorage.getItem("picturePopulate_cach");
         const momentCache = localStorage.getItem("pictureMoment_cach");
         console.log("Caches:", { recentCache, populatCache, momentCache });
-//
+        //
         if (recentCache) {
             setPicturesRecents(JSON.parse(recentCache));
         } else {
             localStorage.setItem("pictureRecents_cach", JSON.stringify(recents));
             setPicturesRecents(recents);
         }
-//
+        //
         if (populatCache) {
             setPicturesPopulate(JSON.parse(populatCache));
         } else {
@@ -265,59 +310,83 @@ const Default=()=>{
         setPicturesRecents(updatedPictures);
         localStorage.setItem("pictureRencents_cach", JSON.stringify(updatedPictures));
     }
-    return(
-        <div className="bg-white min-h-[320px] w-full max-w-4xl mx-auto p-2 rounded-lg">
-                <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-                    {/* Left column: lists */}
-                    <div className="flex-1 space-y-6">
-                        <div className="bg-white">
-                            <h3 className="text-lg font-semibold text-purple-800 mb-3">Mes recherches récentes</h3>
-                            <ul className="space-y-2">
-                                {
-                                    picturesRecents.map((pic) => (
-                                        <div key={pic.id} className="flex items-center justify-between space-x-4 px-3 py-2 ">
-                                        <li className="px-3 py-2 bg-purple-50 rounded-md border border-purple-100">{pic.author}</li>
-                                        <button onClick={() => removeRecentSearch(pic.id)} className="">X</button>
-                                        </div>
-                                    ))
-                                }
-                            </ul>
-                        </div>
+    return (
+        <div className="bg-white min-h-[320px] w-full max-w-4xl mx-auto  rounded-xl grid py-4 ">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8 w-full grid grid-cols-1 md:grid-cols-2">
 
-                        <div>
-                            <h3 className="text-lg font-semibold text-purple-800 mb-3">Recherches populaires</h3>
-                            <ul className="grid grid-cols-2 gap-5">
-                                {
-                                    picturesPopulate.map((pic) => (
-                                        <li key={pic.id} className="px-3 py-2 rounded-lg bg-white border border-purple-100" style={{textAlign:'center'}}>{pic.author}</li>
-                                    ))
-                                }
-                            </ul>
-                        </div>
+                {/* Left column: lists + Top ventes */}
+                <div className="flex-1 space-y-6">
 
-                        <div>
-                            <h3 className="text-lg font-semibold text-purple-800 mb-3">Catégories du moment</h3>
-                            <ul className="space-y-2">
-                                {
-                                    picturesMoments?.map((pic) => (
-                                        <li key={pic.id} className="px-3 py-2 rounded-md bg-white border border-purple-100">{pic.author}</li>
-                                    ))
-                                }
-                            </ul>
-                        </div>
+                    {/* Mes recherches récentes */}
+                    <div className="bg-white">
+                        <h3 className="text-lg font-semibold text-purple-800 mb-3">Mes recherches récentes</h3>
+                        <ul className="space-y-2">
+                            {picturesRecents.map((pic) => (
+                                <li key={pic.id} className="hover:bg-purple-50 hover:rounded-md  hover:border-purple-100 px-2 py-1">{pic.author}</li>
+                            ))}
+                        </ul>
                     </div>
 
-                    {/* Right column: search/hits */}
-                    <div className="w-full md:w-80">
-                        <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
-                            <Configure hitsPerPage={6} />
-                            <div className="bg-white p-4 rounded-lg border border-purple-100 shadow-sm">
-                                <Hits hitComponent={HitsList} classNames={{ list: 'grid grid-cols-1 sm:grid-cols-2 gap-4', item: '' }} />
-                            </div>
-                        </InstantSearch>
+                    {/* Top ventes - carousel */}
+                    <div>
+                        <h3 className="sm:hidden text-lg font-semibold text-purple-800 mb-3">Top ventes</h3>
+
+                        {/* Carousel horizontal pour mobile */}
+                        <div className="sm:hidden overflow-x-auto scrollbar-hidden flex gap-4 py-2">
+                            <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
+                                <Configure hitsPerPage={6} />
+                                <Hits
+                                    hitComponent={HitsList}
+                                    classNames={{
+                                        list: "flex gap-4",
+                                        item: "flex-shrink-0 w-40"
+                                    }}
+                                />
+                            </InstantSearch>
+                        </div>
+
+                        {/* Grid normale pour desktop */}
+                    </div>
+
+                    {/* Recherches populaires */}
+                    <div>
+                        <h3 className="text-lg font-semibold text-purple-800 mb-3">Recherches populaires</h3>
+                        <ul className="grid grid-cols-2 gap-5">
+                            {picturesPopulate.map((pic) => (
+                                <li key={pic.id} className="px-3 py-2 rounded-2xl bg-white border border-purple-100 text-center">{pic.author}</li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Marques du moment */}
+                    <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-purple-800 mb-3">Marques du moment</h3>
+                        <ul className="space-y-2 grid grid-cols-3 gap-5">
+                            {picturesPopulate?.map((pic) => (
+                                <li key={pic.id} className="px-3 rounded-2xl bg-white border border-purple-100">{pic.author}</li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
+
+                {/* Right column: Top ventes desktop */}
+                <div className="hidden sm:flex sm:flex-col flex-1">
+                    <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
+                        <h3 className="text-lg font-semibold text-purple-800 mb-3">Top ventes</h3>
+                        <Configure hitsPerPage={6} />
+                        <Hits
+                            hitComponent={HitsList}
+                            classNames={{
+                                list: "grid grid-cols-3 gap-4",
+                                item: ""
+                            }}
+                        />
+                    </InstantSearch>
+                </div>
             </div>
+        </div>
+
+
     )
 }
 
@@ -340,9 +409,9 @@ export default function Racine() {
 
     return (
         <SearchUIContext.Provider value={{ isOpen, setIsOpen }} >
-            <div ref={containerRef} className="w-full max-w-4xl mx-auto p-6 bg-white">
+            <div ref={containerRef} className=" max-w-4xl mx-auto px-6 bg-white rounded-xl shadow-md  border-purple-200 shadow-lg backdrop-blur-sm">
                 <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
-                    <Configure hitsPerPage={20} />
+                    <Configure hitsPerPage={6} />
 
                     {/* SearchBox initiale visible toujours */}
                     {!isOpen && <SearchInput />}
@@ -351,6 +420,7 @@ export default function Racine() {
                     <SearchResultsBlock />
                 </InstantSearch>
             </div>
+            
         </SearchUIContext.Provider>
     );
 }
