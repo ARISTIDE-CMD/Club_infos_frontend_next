@@ -23,7 +23,7 @@ const typesenseInstantSearchAdapter = new TypesenseInstantsearchAdapter({
             {
                 protocol: 'http',
                 port: 8108,
-                host: '192.168.1.209'
+                host: '192.168.0.118'
             }
         ]
     },
@@ -65,13 +65,21 @@ const recents = [
         url: 'https://unsplash.com/photos/example7',
         download_url: 'https://picsum.photos/id/7/5300/3600'
     },
+    {
+        id: 3,
+        author: 'Alice',
+        width: 4000,
+        height: 6000,
+        url: 'https://unsplash.com/photos/example3',
+        download_url: 'https://picsum.photos/id/3/4000/6000'
+    },
 
 ]
 
 const populate = [
     {
         id: 3,
-        author: 'Alice Johnson',
+        author: 'Alice',
         width: 4000,
         height: 6000,
         url: 'https://unsplash.com/photos/example3',
@@ -153,11 +161,11 @@ const highlightQuery = (text: string, query: string) => {
 
     return parts.map((part, index) =>
         regex.test(part) ? (
-            <span key={index} className="bg-yellow-200 text-purple-800 font-semibold">
+            <span key={index} >
                 {part}
             </span>
         ) : (
-            <span key={index}>{part}</span>
+            <span key={index} className=" font-semibold">{part}</span>
         )
     );
 };
@@ -167,10 +175,13 @@ const componentsResults = () => {
         <>
             <div>
                 <h3 className="text-lg font-semibold text-purple-800 mb-3">Recherches populaires</h3>
-                <ul className="grid grid-cols-4 gap-5">
-                    {recents.map((pic) => (
-                        <li key={pic.id} className="px-3 py-2 rounded-2xl bg-white border border-purple-100 text-center">{pic.author}</li>
-                    ))}
+                <ul className=" grid grid-cols-3 gap-5">
+                    {recents.map((pic) => {
+                        const firstWord = pic.author.split(' ')[0];
+                        return (
+                            <li key={pic.id} className="p-2 rounded-2xl bg-white border border-purple-100 font-semibold text-center">{firstWord}</li>
+                        )
+                    })}
                 </ul>
             </div>
 
@@ -179,7 +190,7 @@ const componentsResults = () => {
                     {populate.map((element) => (
                         <div
                             key={element.id}
-                            className="flex-shrink-0 bg-white rounded-md overflow-hidden border border-purple-100 shadow-sm w-60"
+                            className="flex-shrink-0 bg-white rounded-md overflow-hidden border border-purple-100 shadow-sm w-50 md:w-42"
                         >
                             <img
                                 src={element.download_url}
@@ -193,6 +204,7 @@ const componentsResults = () => {
                     ))}
                 </div>
             </div>
+            <button className="mb-4 mt-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors duration-200 md:w[100vw]">Voir +500</button>
 
         </>
     )
@@ -215,43 +227,44 @@ const SearchResultsBlock = () => {
 
     return (
         <div
-            className={` max-w-4xl mx-auto mt-4 overflow-hidden transition-all duration-500 ${isOpen ? "max-h-[1000px] opacity-100 w-full" : "max-h-0 opacity-0"
+            className={` max-w-4xl mx-auto px-3 overflow-hidden rounded-2xl transition-all duration-500 ${isOpen ? "max-h-[1000px] opacity-100 w-full" : "max-h-0 opacity-0"
                 }`}
             ref={containerRef}
         >
-            <div className="bg-white  rounded-lg shadow-lg  border-purple-300 space-y-4">
+            <div className="bg-white  rounded-2xl space-y-4">
                 {/* SearchBox à l’intérieur */}
                 <SearchBox
                     classNames={{
-                        root: "w-full",
-                        form: "relative flex items-center border-2 border-purple-300 rounded-full overflow-hidden shadow-md focus-within:ring-4 focus-within:ring-purple-300 transition-all duration-300",
-                        input: "flex-grow px-4 py-3 pr-14 outline-none text-gray-700 placeholder-gray-400 focus:outline-none",
+                        // mobile: shift left with negative horizontal margin; from `sm` restore normal centering
+                        root: "w-full mt-3 mx-3 sm:mx-0",
+                        form: "relative flex items-center border-2 border-purple-300 rounded-full overflow-hidden shadow-md  transition-all duration-300",
+                        input: "flex-grow px-4 py-3 pr-14 outline-none text-gray-700 placeholder-gray-400 ",
                         submit: "absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-200 rounded-full",
                         reset: "absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-150",
                     }}
-
-                    placeholder="Rechercher des images..."
+                    placeholder="Rechercher un produit..."
                 />
+
 
                 {/* Contenu selon saisie */}
                 {query ? (
                     <>
-                       <div>
-                        <h3 className="font-semibold text-purple-700">
-                            Résultats pour : "{query}"
-                        </h3>
-                        <Hits
-                            hitComponent={({ hit }: HitProps) => (
-                                <div className="px-3 py-2 bg-purple-50 rounded-md border border-purple-100">
-                                    {highlightQuery(hit.author, query)}
-                                </div>
-                            )}
-                            classNames={{
-                                list: "grid grid-cols-1 sm:grid-cols-2 gap-4",
-                            }}
-                        />
-                        {componentsResults()}
-                   </div>  </>
+                        <div className="">
+                            <h3 className="font-semibold text-purple-700">
+                                Résultats pour : "{query}"
+                            </h3>
+                            <Hits
+                                hitComponent={({ hit }: HitProps) => (
+                                    <div className="p-1  hover:bg-purple-50 hover:rounded-md hover:border hover:border-purple-100 opacity-90">
+                                        {highlightQuery(hit.author, query)}
+                                    </div>
+                                )}
+                                classNames={{
+                                    list: "grid grid-cols-1 sm:grid-cols-2 gap-2",
+                                }}
+                            />
+                            {componentsResults()}
+                        </div>  </>
                 ) : (
                     <Default />
                 )}
@@ -311,7 +324,7 @@ const Default = () => {
         localStorage.setItem("pictureRencents_cach", JSON.stringify(updatedPictures));
     }
     return (
-        <div className="bg-white min-h-[320px] w-full max-w-4xl mx-auto  rounded-xl grid py-4 ">
+        <div className="bg-white min-h-[320px] w-full max-w-4xl mx-auto  rounded-2xl grid py-4 px-3 ">
             <div className="flex flex-col md:flex-row gap-6 md:gap-8 w-full grid grid-cols-1 md:grid-cols-2">
 
                 {/* Left column: lists + Top ventes */}
@@ -409,18 +422,31 @@ export default function Racine() {
 
     return (
         <SearchUIContext.Provider value={{ isOpen, setIsOpen }} >
-            <div ref={containerRef} className=" max-w-4xl mx-auto px-6 bg-white rounded-xl shadow-md  border-purple-200 shadow-lg backdrop-blur-sm">
+            <div
+                ref={containerRef}
+                className="relative max-w-4xl mx-auto bg-white rounded-2xl shadow-md border-purple-200 shadow-lg backdrop-blur-sm mt-4"
+            >
                 <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
                     <Configure hitsPerPage={6} />
-
-                    {/* SearchBox initiale visible toujours */}
                     {!isOpen && <SearchInput />}
-
-                    {/* Bloc qui se déploie au clic */}
                     <SearchResultsBlock />
+                    <button
+                        aria-label="Fermer la recherche"
+                        className={`hidden md:flex absolute -top-2 -right-10 p-2 rounded-full bg-white-600 text-white hover:opacity-75 transition-colors duration-200 ${isOpen ? '' : 'opacity-0 pointer-events-none'}`}
+                        onClick={() => setIsOpen(false)}
+                    >
+                        ✕
+                    </button>
+
+                    <button
+                        aria-label="Retour"
+                        className={`md:hidden absolute top-4 left- p-2 rounded-full  text-gray transition-colors duration-200 ${isOpen ? '' : 'opacity-0 pointer-events-none'}`}
+                        onClick={() => setIsOpen(false)}
+                    >
+                        ←
+                    </button>
                 </InstantSearch>
             </div>
-            
         </SearchUIContext.Provider>
     );
 }

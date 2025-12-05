@@ -1,0 +1,4 @@
+class="relative flex h-[44px] w-full flex-1 appearance-none truncate
+            rounded-[22px] bg-foundation-inverted pl-m pr-[44px] text-body1
+            placeholder:truncate placeholder:text-foundation-secondary
+            focus:outline-none [&::-webkit-search-cancel-button]:hidden pr-[44px] desktop:pr-[78px] genai-border animate-genai-angle border-2 border-accent-primary"
