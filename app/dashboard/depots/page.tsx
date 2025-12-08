@@ -295,7 +295,7 @@ const Default = () => {
         const recentCache = localStorage.getItem("pictureRecents_cach");
         const populatCache = localStorage.getItem("picturePopulate_cach");
         const momentCache = localStorage.getItem("pictureMoment_cach");
-        console.log("Caches:", { recentCache, populatCache, momentCache });
+        console.log("Caches:", { momentCache });
         //
         if (recentCache) {
             setPicturesRecents(JSON.parse(recentCache));
@@ -333,6 +333,7 @@ const Default = () => {
                     {/* Mes recherches récentes */}
                     <div className="bg-white">
                         <h3 className="text-lg font-semibold text-purple-800 mb-3">Mes recherches récentes</h3>
+                        <span className="text-sm text-gray-500 mb-2 block">Vous pouvez supprimer une recherche en cliquant dessus</span>
                         <ul className="space-y-2">
                             {picturesRecents.map((pic) => (
                                 <li key={pic.id} className="hover:bg-purple-50 hover:rounded-md  hover:border-purple-100 px-2 py-1">{pic.author}</li>
