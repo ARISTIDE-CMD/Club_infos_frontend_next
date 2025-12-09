@@ -218,10 +218,10 @@ const componentsResults = () => {
                     {recents.map((pic) => {
                         const firstWord = pic.author.split(' ')[0];
                         return (
-                            <li 
-                                key={pic.id} 
+                            <li
+                                key={pic.id}
                                 className="p-2 rounded-2xl bg-white border font-semibold text-center transition-colors duration-200"
-                                style={{ 
+                                style={{
                                     borderColor: '#092c74',
                                     color: '#092c74'
                                 }}
@@ -263,9 +263,9 @@ const componentsResults = () => {
                     ))}
                 </div>
             </div>
-            <button 
+            <button
                 className="mb-4 mt-4 px-4 py-2 text-white rounded-md transition-all duration-200 hover:shadow-lg"
-                style={{ 
+                style={{
                     backgroundColor: '#092c74',
                 }}
                 onMouseEnter={(e) => {
@@ -286,21 +286,20 @@ const SearchResultsBlock = () => {
     const { indexUiState } = useInstantSearch();
     const query = indexUiState.query as string;
     const containerRef = useRef<HTMLDivElement>(null);
-    
+
     useEffect(() => {
         if (isOpen && containerRef.current) {
             const input = containerRef.current.querySelector<HTMLInputElement>("input");
             if (input) input.focus();
         }
     }, [isOpen]);
-    
+
     if (!isOpen) return null;
 
     return (
         <div
-            className={`max-w-4xl mx-auto px-3 overflow-hidden rounded-2xl transition-all duration-500 ${
-                isOpen ? "max-h-[1000px] opacity-100 w-full" : "max-h-0 opacity-0"
-            }`}
+            className={`max-w-4xl mx-auto px-3 overflow-hidden rounded-2xl transition-all duration-500 ${isOpen ? "max-h-[1000px] opacity-100 w-full" : "max-h-0 opacity-0"
+                }`}
             ref={containerRef}
         >
             <div className="bg-white rounded-2xl space-y-4">
@@ -332,7 +331,7 @@ const SearchResultsBlock = () => {
                         color: #092c74 !important;
                     }
                 `}</style>
-                
+
                 {query ? (
                     <>
                         <div className="">
@@ -341,7 +340,7 @@ const SearchResultsBlock = () => {
                             </h4>
                             <Hits
                                 hitComponent={({ hit }: HitProps) => (
-                                    <div 
+                                    <div
                                         className="p-1 hover:rounded-md hover:border opacity-90 transition-colors duration-150"
                                         style={{
                                             '--hover-bg': 'rgba(253, 189, 0, 0.1)',
@@ -373,30 +372,12 @@ const SearchResultsBlock = () => {
     );
 };
 
-const Default = () => {
+// Components of default view
+const recentComponent = () => {
     const [picturesRecents, setPicturesRecents] = useState<typeof recents>([]);
-    const [picturesPopulate, setPicturesPopulate] = useState<typeof populate>([]);
-    const [picturesMoments, setPicturesMoments] = useState<typeof populate>([]);
 
-     const responseMoment = async () => {
-            try {
-                const response = await api.get('/list');
-                console.log("moment pictures:", response.data);
-                setPicturesMoments(response.data);
-                localStorage.setItem("pictureMoment_cach", JSON.stringify(response.data));
-            } catch (error) {
-                console.error("Error fetching moment pictures:", error);
-                // return [];
-            }
-        }
-    
     useEffect(() => {
         const recentCache = localStorage.getItem("pictureRecents_cach");
-        const populatCache = localStorage.getItem("picturePopulate_cach");
-        const momentCache = localStorage.getItem("pictureMoment_cach");
-        console.log("Caches:", { recentCache, momentCache });
-        
-        // CORRECTION: Vérifier si le cache existe, pas s'il est vide
         if (recentCache !== null) {
             // Le cache existe (même vide), on l'utilise
             setPicturesRecents(JSON.parse(recentCache));
@@ -407,201 +388,247 @@ const Default = () => {
             setPicturesRecents(recents);
             console.log(recents)
         }
-        
+    }, [])
+const removeRecentSearch = () => {
+        setPicturesRecents([]);
+        localStorage.setItem("pictureRecents_cach", JSON.stringify([]));
+    }
+
+    const handleDelete = (id: number) => {
+        const updatedItems = picturesRecents.filter(item => item.id !== id);
+        setPicturesRecents(updatedItems);
+        localStorage.setItem("pictureRecents_cach", JSON.stringify(updatedItems));
+    };
+    return (
+        <div>
+            <div className="flex items-center justify-start">
+                <h4 className="text-lg font-semibold mr-3" style={{ color: '#092c74' }}>
+                    Mes recherches récentes
+                </h4>
+                <p className="text-sm block underline hover:opacity-75 cursor-pointer transition-colors duration-150"
+                    style={{ color: '#fdbd00' }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#e5a800'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#fdbd00'}
+                >
+                    <button
+                    // onClick={removeRecentSearch}
+                    >Tout effacer</button>
+                </p>
+            </div>
+            <ul className="space-y-2">
+                {picturesRecents.length > 0 ? picturesRecents.slice(0, 2).map((pic) => (
+                    <p
+                        key={pic.id}
+                        className="flex justify-between items-center cursor-pointer hover:rounded-md px-2 transition-all duration-150"
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(253, 189, 0, 0.1)';
+                            e.currentTarget.style.borderColor = '#fdbd00';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                    >
+                        <li className="transition-colors duration-150"
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#092c74'}
+                        >
+                            {pic.author}
+                        </li>
+                        <button
+                            className="rounded-full p-2 hover:bg-gray-100 transition-colors duration-150"
+                            style={{ color: '#092c74' }}
+                            // onClick={() => handleDelete(pic.id)}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#fdbd00'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#092c74'}
+                        >
+                            ✕
+                        </button>
+                    </p>
+                )) : (
+                    <p className="text-gray-500 opacity-50">Aucune recherche récente</p>
+                )}
+            </ul>
+        </div>
+    )
+}
+const populateComponent = () => {
+    const [picturesPopulate, setPicturesPopulate] = useState<typeof populate>([]);
+    useEffect(() => {
+        const populatCache = localStorage.getItem("picturePopulate_cach");
         if (populatCache !== null) {
             setPicturesPopulate(JSON.parse(populatCache));
         } else {
             localStorage.setItem("picturePopulate_cach", JSON.stringify(populate));
             setPicturesPopulate(populate);
         }
+    }, [])
 
-        if (momentCache !== null) {
-            setPicturesMoments(JSON.parse(momentCache));
+    return (
+        <div>
+            <h4 className="text-lg font-semibold" style={{ color: '#092c74' }}>
+                Recherches populaires
+            </h4>
+            <ul className="space-y-2">
+                {picturesPopulate.map((pic) => (
+                    <li
+                        key={pic.id}
+                        className="cursor-pointer hover:rounded-md px-2 py-1 transition-all duration-150"
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(253, 189, 0, 0.1)';
+                            e.currentTarget.style.color = '#092c74';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.color = 'inherit';
+                        }}
+                    >
+                        {pic.author}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )
+}
+const topSell = () => {
+    return (
+        <div>
+            <h4 className="sm:hidden text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
+                Top ventes
+            </h4>
+            <div className="sm:hidden overflow-x-auto scrollbar-hidden flex gap-4 py-2">
+                <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
+                    <Configure hitsPerPage={6} />
+                    <Hits
+                        hitComponent={HitsList}
+                        classNames={{
+                            list: "flex gap-4",
+                            item: "flex-shrink-0 w-40"
+                        }}
+                    />
+                </InstantSearch>
+            </div>
+        </div>
+    )
+}
+const topSellMoment = () => {
+    return (
+        <div className="hidden sm:flex sm:flex-col flex-1">
+            <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
+                <h4 className="text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
+                    Top ventes du moment
+                </h4>
+                <Configure hitsPerPage={6} />
+                <Hits
+                    hitComponent={HitsList}
+                    classNames={{
+                        list: "grid grid-cols-3 gap-4",
+                        item: ""
+                    }}
+                />
+            </InstantSearch>
+        </div>
+    )
+}
+const marqueMoment = () => {
+    const [picturesPopulate, setPicturesPopulate] = useState<typeof populate>([]);
+    useEffect(() => {
+        const populatCache = localStorage.getItem("picturePopulate_cach");
+        if (populatCache !== null) {
+            setPicturesPopulate(JSON.parse(populatCache));
         } else {
-            responseMoment();
+            localStorage.setItem("picturePopulate_cach", JSON.stringify(populate));
+            setPicturesPopulate(populate);
         }
-    }, []);
+    }, [])
 
-    const removeRecentSearch = () => {
-        setPicturesRecents([]);
-        localStorage.setItem("pictureRecents_cach", JSON.stringify([]));
-    }
-    
-    const handleDelete = (id: number) => {
-        const updatedItems = picturesRecents.filter(item => item.id !== id);
-        setPicturesRecents(updatedItems);
-        localStorage.setItem("pictureRecents_cach", JSON.stringify(updatedItems));
-    };
-    
+    return (
+        <div className="mb-4">
+            <h4 className="text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
+                Marques du moment
+            </h4>
+            <ul className="space-y-2 grid grid-cols-3 gap-5">
+                {picturesPopulate.slice(0, 3).map((pic) => (
+                    <li
+                        key={pic.id}
+                        className="cursor-pointer px-3 py-2 rounded-2xl bg-white border transition-all duration-200"
+                        style={{ borderColor: '#092c74' }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(253, 189, 0, 0.1)';
+                            e.currentTarget.style.borderColor = '#fdbd00';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.borderColor = '#092c74';
+                        }}
+                    >
+                        {pic.author}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )
+}
+const categoryMoment = () => {
+    const [picturesPopulate, setPicturesPopulate] = useState<typeof populate>([]);
+    useEffect(() => {
+        const populatCache = localStorage.getItem("picturePopulate_cach");
+        if (populatCache !== null) {
+            setPicturesPopulate(JSON.parse(populatCache));
+        } else {
+            localStorage.setItem("picturePopulate_cach", JSON.stringify(populate));
+            setPicturesPopulate(populate);
+        }
+    }, [])
+    return (
+        <div>
+            <h4 className="text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
+                Catégories du moment
+            </h4>
+            <ul className="grid grid-cols-2 gap-3">
+                {picturesPopulate.map((pic) => (
+                    <li
+                        key={pic.id}
+                        className="cursor-pointer w-full px-1 py-2 font-semibold rounded-full bg-white border text-center transition-all duration-200"
+                        style={{
+                            borderColor: '#092c74',
+                            color: '#092c74'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#fdbd00';
+                            e.currentTarget.style.borderColor = '#fdbd00';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.borderColor = '#092c74';
+                        }}
+                    >
+                        {pic.author}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )
+}
+
+
+const Default = () => {
     return (
         <div className="bg-white min-h-[320px] w-full max-w-4xl mx-auto sm:rounded-2xl grid py-4 px-3">
             <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full grid grid-cols-1 md:grid-cols-2">
-                
+
                 <div className="flex-1 space-y-4 w-auto">
                     {/* Mes recherches récentes */}
-                    <div>
-                        <div className="flex items-center justify-start">
-                            <h4 className="text-lg font-semibold mr-3" style={{ color: '#092c74' }}>
-                                Mes recherches récentes
-                            </h4>
-                            <p className="text-sm block underline hover:opacity-75 cursor-pointer transition-colors duration-150" 
-                               style={{ color: '#fdbd00' }}
-                               onMouseEnter={(e) => e.currentTarget.style.color = '#e5a800'}
-                               onMouseLeave={(e) => e.currentTarget.style.color = '#fdbd00'}
-                            >
-                                <button onClick={removeRecentSearch}>Tout effacer</button>
-                            </p>
-                        </div>
-                        <ul className="space-y-2">
-                            {picturesPopulate.length > 0 ? picturesPopulate.slice(0, 2).map((pic) => (
-                                <p 
-                                    key={pic.id} 
-                                    className="flex justify-between items-center cursor-pointer hover:rounded-md px-2 transition-all duration-150"
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'rgba(253, 189, 0, 0.1)';
-                                        e.currentTarget.style.borderColor = '#fdbd00';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'transparent';
-                                    }}
-                                >
-                                    <li className="transition-colors duration-150"
-                                        onMouseEnter={(e) => e.currentTarget.style.color = '#092c74'}
-                                    >
-                                        {pic.author}
-                                    </li>
-                                    <button 
-                                        className="rounded-full p-2 hover:bg-gray-100 transition-colors duration-150"
-                                        style={{ color: '#092c74' }}
-                                        onClick={() => handleDelete(pic.id)}
-                                        onMouseEnter={(e) => e.currentTarget.style.color = '#fdbd00'}
-                                        onMouseLeave={(e) => e.currentTarget.style.color = '#092c74'}
-                                    >
-                                        ✕
-                                    </button>
-                                </p>
-                            )) : (
-                                <p className="text-gray-500 opacity-50">Aucune recherche récente</p>
-                            )}
-                        </ul>
-                    </div>
-
+                    {recentComponent()}
                     {/* Recherches populaires */}
-                    <div>
-                        <h4 className="text-lg font-semibold" style={{ color: '#092c74' }}>
-                            Recherches populaires
-                        </h4>
-                        <ul className="space-y-2">
-                            {picturesPopulate.map((pic) => (
-                                <li 
-                                    key={pic.id} 
-                                    className="cursor-pointer hover:rounded-md px-2 py-1 transition-all duration-150"
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'rgba(253, 189, 0, 0.1)';
-                                        e.currentTarget.style.color = '#092c74';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'transparent';
-                                        e.currentTarget.style.color = 'inherit';
-                                    }}
-                                >
-                                    {pic.author}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
+                    {populateComponent()}
                     {/* Top ventes mobile */}
-                    <div>
-                        <h4 className="sm:hidden text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
-                            Top ventes
-                        </h4>
-                        <div className="sm:hidden overflow-x-auto scrollbar-hidden flex gap-4 py-2">
-                            <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
-                                <Configure hitsPerPage={6} />
-                                <Hits
-                                    hitComponent={HitsList}
-                                    classNames={{
-                                        list: "flex gap-4",
-                                        item: "flex-shrink-0 w-40"
-                                    }}
-                                />
-                            </InstantSearch>
-                        </div>
-                    </div>
-
+                    {topSell()}
                     {/* Catégories du moment */}
-                    <div>
-                        <h4 className="text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
-                            Catégories du moment
-                        </h4>
-                        <ul className="grid grid-cols-2 gap-3">
-                            {picturesPopulate.map((pic) => (
-                                <li 
-                                    key={pic.id} 
-                                    className="cursor-pointer w-full px-1 py-2 font-semibold rounded-full bg-white border text-center transition-all duration-200"
-                                    style={{ 
-                                        borderColor: '#092c74',
-                                        color: '#092c74'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#fdbd00';
-                                        e.currentTarget.style.borderColor = '#fdbd00';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'white';
-                                        e.currentTarget.style.borderColor = '#092c74';
-                                    }}
-                                >
-                                    {pic.author}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
+                    {categoryMoment()}
                     {/* Marques du moment */}
-                    <div className="mb-4">
-                        <h4 className="text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
-                            Marques du moment
-                        </h4>
-                        <ul className="space-y-2 grid grid-cols-3 gap-5">
-                            {picturesPopulate.slice(0, 3).map((pic) => (
-                                <li 
-                                    key={pic.id} 
-                                    className="cursor-pointer px-3 py-2 rounded-2xl bg-white border transition-all duration-200"
-                                    style={{ borderColor: '#092c74' }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'rgba(253, 189, 0, 0.1)';
-                                        e.currentTarget.style.borderColor = '#fdbd00';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'white';
-                                        e.currentTarget.style.borderColor = '#092c74';
-                                    }}
-                                >
-                                    {pic.author}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    {marqueMoment()}
                 </div>
-
                 {/* Right column: Top ventes desktop */}
-                <div className="hidden sm:flex sm:flex-col flex-1">
-                    <InstantSearch indexName="images" searchClient={typesenseInstantSearchAdapter.searchClient}>
-                        <h4 className="text-lg font-semibold mb-3" style={{ color: '#092c74' }}>
-                            Top ventes du moment
-                        </h4>
-                        <Configure hitsPerPage={6} />
-                        <Hits
-                            hitComponent={HitsList}
-                            classNames={{
-                                list: "grid grid-cols-3 gap-4",
-                                item: ""
-                            }}
-                        />
-                    </InstantSearch>
-                </div>
+                {topSellMoment()}
             </div>
         </div>
     )
@@ -610,7 +637,7 @@ const Default = () => {
 export default function Racine() {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
-    
+
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (!isOpen) return;
@@ -634,13 +661,12 @@ export default function Racine() {
                     <Configure hitsPerPage={6} />
                     {!isOpen && <SearchInput />}
                     <SearchResultsBlock />
-                    
+
                     {/* Bouton retour mobile */}
                     <button
                         aria-label="Retour"
-                        className={`md:hidden absolute top-4 left-2 p-2 rounded-full transition-all duration-200 ${
-                            isOpen ? '' : 'opacity-0 pointer-events-none'
-                        }`}
+                        className={`md:hidden absolute top-4 left-2 p-2 rounded-full transition-all duration-200 ${isOpen ? '' : 'opacity-0 pointer-events-none'
+                            }`}
                         style={{ color: '#092c74' }}
                         onClick={() => setIsOpen(false)}
                         onMouseEnter={(e) => {
